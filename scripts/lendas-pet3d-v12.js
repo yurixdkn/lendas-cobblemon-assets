@@ -16,6 +16,25 @@ if (finePointer && !reducedMotion && !window.__lendasPet3DV12Ready) {
 
 function initPet() {
   const legacySelector = '.lendas-pet-follower, .lendas-pointer-pokemon, .lendas-pet-cursor';
+  /* O seguidor fica correto mesmo se o CSS novo não for importado na loja. */
+  if (!document.getElementById('lendas-pet3d-v12-style')) {
+    const style = document.createElement('style');
+    style.id = 'lendas-pet3d-v12-style';
+    style.textContent = `
+      .lendas-pet-follower,.lendas-pointer-pokemon,.lendas-pet-cursor {display:none!important}
+      .lendas-pet3d-host {position:fixed;top:0;left:0;z-index:2147483000;
+        width:152px;height:152px;pointer-events:none;opacity:0;
+        transform:translate3d(-200px,-200px,0);transition:opacity .2s;will-change:transform}
+      .lendas-pet3d-host.is-visible {opacity:1}
+      .lendas-pet3d-host canvas {display:block;width:100%;height:100%;background:transparent}
+      .lendas-pet3d-shadow {position:absolute;bottom:15px;left:25%;width:50%;height:13px;
+        background:rgba(0,0,0,.28);filter:blur(7px);border-radius:50%}
+      @media (max-width:740px),(pointer:coarse),(prefers-reduced-motion:reduce) {
+        .lendas-pet3d-host {display:none!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
   document.querySelectorAll(legacySelector + ', .lendas-pet3d-host').forEach(node => node.remove());
   /* Um script antigo em cache não pode colocar um segundo Pikachu depois. */
   const dedupe = new MutationObserver(records => {
